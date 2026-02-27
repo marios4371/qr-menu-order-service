@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: SaaS QR Menu Order Service Backend
+
+Resources:
+  # 1. DATABASE: The DynamoDB Table
+  OrdersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: SaaS_Orders
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: shopId
+          AttributeType: S
+        - AttributeName: orderId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: shopId  # Partition Key (PK)
+          KeyType: HASH
+        - AttributeName: orderId # Sort Key (SK)
+          KeyType: RANGE
+
+  # 2. BACKEND: The Java Lambda Function
+  CreateOrderFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      # This path must match the output of your 'mvn clean package'
+      CodeUri: target/qrmenu-order-service-1.0-SNAPSHOT.jar
+      # Make sure this matches your exact package and class name!
+      Handler: com.qrmenu.orders.handlers.CreateOrderHandler::handleRequest
+      Runtime: java21
+      MemorySize: 512
+      Timeout: 15
+      Environment:
+        Variables:
+          ORDERS_TABLE: !Ref OrdersTable
+      # Automatically grants this Lambda permission to read/write to the table above
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref OrdersTable
+      # 3. API GATEWAY: The HTTP Endpoint
+      Events:
+        CreateOrderApi:
+          Type: Api
+          Properties:
+            Path: /orders
+            Method: post
