@@ -92,8 +92,9 @@ public class CreateOrderHandler implements RequestHandler<APIGatewayProxyRequest
     private APIGatewayProxyResponseEvent createResponse(int statusCode, String body) {
         Map<String, String> headers = new HashMap<>();
         headers.put("Content-Type", "application/json");
-        // CORS headers - crucial for web/mobile apps
         headers.put("Access-Control-Allow-Origin", "*");
+        headers.put("Access-Control-Allow-Methods", "OPTIONS,POST,GET");
+        headers.put("Access-Control-Allow-Headers", "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token");
 
         return new APIGatewayProxyResponseEvent()
                 .withStatusCode(statusCode)

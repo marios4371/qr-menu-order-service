@@ -7,7 +7,7 @@ Resources:
   OrdersTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: SaaS_Orders
+      TableName: orders
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
         - AttributeName: shopId
@@ -24,9 +24,7 @@ Resources:
   CreateOrderFunction:
     Type: AWS::Serverless::Function
     Properties:
-      # This path must match the output of your 'mvn clean package'
       CodeUri: target/qrmenu-order-service-1.0-SNAPSHOT.jar
-      # Make sure this matches your exact package and class name!
       Handler: com.qrmenu.orders.handlers.CreateOrderHandler::handleRequest
       Runtime: java21
       MemorySize: 512
@@ -34,14 +32,86 @@ Resources:
       Environment:
         Variables:
           ORDERS_TABLE: !Ref OrdersTable
-      # Automatically grants this Lambda permission to read/write to the table above
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref OrdersTable
-      # 3. API GATEWAY: The HTTP Endpoint
       Events:
         CreateOrderApi:
           Type: Api
           Properties:
             Path: /orders
             Method: post
+
+  GetOrdersFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: target/qrmenu-order-service-1.0-SNAPSHOT.jar
+      Handler: com.qrmenu.orders.handlers.GetOrdersHandler::handleRequest
+      Runtime: java21
+      MemorySize: 512
+      Timeout: 15
+      Environment:
+        Variables:
+          ORDERS_TABLE: !Ref OrdersTable
+      Policies:
+        # Notice we only give READ policy here, for security!
+        - DynamoDBReadPolicy:
+            TableName: !Ref OrdersTable
+      Events:
+        GetOrdersApi:
+          Type: Api
+          Properties:
+            Path: /orders
+            Method: get
+
+  UpdateOrderStatusFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: target/qrmenu-order-service-1.0-SNAPSHOT.jar
+      Handler: com.qrmenu.orders.handlers.UpdateOrderStatusHandler::handleRequest
+      Runtime: java21
+      MemorySize: 512
+      Timeout: 15
+      Environment:
+        Variables:
+          ORDERS_TABLE: orders
+      Policies:
+        - DynamoDBWritePolicy:
+            TableName: orders
+      Events:
+        UpdateOrderApi:
+          Type: Api
+          Properties:
+            Path: /orders/status
+            Method: patch
+
+  # GET MENU
+
+  GetMenuFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: target/qrmenu-order-service-1.0-SNAPSHOT.jar
+      Handler: com.qrmenu.orders.handlers.GetMenuHandler::handleRequest
+      Runtime: java21
+      MemorySize: 512
+      Timeout: 10
+      Environment:
+        Variables:
+          MENUS_TABLE: Menus
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: Menus
+      Events:
+        GetMenuApi:
+          Type: Api
+          Properties:
+            Path: /menu
+            Method: get
+
+
+
+# 3. OUTPUTS: This must be completely to the left, same level as Resources
+Outputs:
+  OrderApiUrl:
+    Description: "API Gateway endpoint URL for Prod stage"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/orders"
