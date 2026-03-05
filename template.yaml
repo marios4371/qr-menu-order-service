@@ -2,6 +2,13 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: SaaS QR Menu Order Service Backend
 
+Globals:
+  Api:
+    Cors:
+      AllowMethods: "'OPTIONS,POST,GET,PATCH,PUT'"
+      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+      AllowOrigin: "'*'"
+
 Resources:
   # 1. DATABASE: The DynamoDB Table
   OrdersTable:
@@ -24,7 +31,7 @@ Resources:
   CreateOrderFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: target/qrmenu-order-service-1.0-SNAPSHOT.jar
+      CodeUri: .
       Handler: com.qrmenu.orders.handlers.CreateOrderHandler::handleRequest
       Runtime: java21
       MemorySize: 512
@@ -45,7 +52,7 @@ Resources:
   GetOrdersFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: target/qrmenu-order-service-1.0-SNAPSHOT.jar
+      CodeUri: .
       Handler: com.qrmenu.orders.handlers.GetOrdersHandler::handleRequest
       Runtime: java21
       MemorySize: 512
@@ -67,7 +74,7 @@ Resources:
   UpdateOrderStatusFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: target/qrmenu-order-service-1.0-SNAPSHOT.jar
+      CodeUri: .
       Handler: com.qrmenu.orders.handlers.UpdateOrderStatusHandler::handleRequest
       Runtime: java21
       MemorySize: 512
@@ -76,7 +83,7 @@ Resources:
         Variables:
           ORDERS_TABLE: orders
       Policies:
-        - DynamoDBWritePolicy:
+        - DynamoDBCrudPolicy:
             TableName: orders
       Events:
         UpdateOrderApi:
@@ -90,7 +97,7 @@ Resources:
   GetMenuFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: target/qrmenu-order-service-1.0-SNAPSHOT.jar
+      CodeUri: .
       Handler: com.qrmenu.orders.handlers.GetMenuHandler::handleRequest
       Runtime: java21
       MemorySize: 512

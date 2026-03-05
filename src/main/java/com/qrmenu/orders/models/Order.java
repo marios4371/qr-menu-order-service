@@ -21,6 +21,10 @@ public class Order {
     // ISO 8601 string or Epoch timestamp
     private String createdAt;
 
+    private String claimedBy;
+
+    private String paymentStatus;
+
     // DEFAULT CONSTRUCTOR (Required for JSON serialization/deserialization)
     public Order() {
     }
@@ -89,5 +93,21 @@ public class Order {
 
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getClaimedBy() {
+        return claimedBy;
+    }
+
+    public void setClaimedBy(String claimedBy) {
+        this.claimedBy = claimedBy;
+    }
+
+    public String getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void setPaymentStatus(String paymentStatus) {
+        this.paymentStatus = paymentStatus;
     }
 }

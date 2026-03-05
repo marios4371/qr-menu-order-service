@@ -4,13 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3a436e09-d686-4984-9f6d-7d0b329b77c4" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/qrmenu/orders/handlers/GetMenuHandler.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/qrmenu/orders/handlers/GetOrdersHandler.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/qrmenu/orders/handlers/UpdateOrderStatusHandler.java" afterDir="false" />
+    <list default="true" id="3a436e09-d686-4984-9f6d-7d0b329b77c4" name="Changes" comment="fix functions with stations : bar, kitchen, service">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/qrmenu/orders/models/OrderUpdateRequest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/qrmenu/orders/handlers/CreateOrderHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/qrmenu/orders/handlers/CreateOrderHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/qrmenu/orders/handlers/UpdateOrderStatusHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/qrmenu/orders/handlers/UpdateOrderStatusHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/qrmenu/orders/models/Order.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/qrmenu/orders/models/Order.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/qrmenu/orders/models/OrderItem.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/qrmenu/orders/models/OrderItem.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/template.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/template.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -63,7 +64,10 @@
       <workItem from="1772297915053" duration="344000" />
       <workItem from="1772298286629" duration="3257000" />
       <workItem from="1772379169202" duration="3234000" />
-      <workItem from="1772474128478" duration="1184000" />
+      <workItem from="1772474128478" duration="2654000" />
+      <workItem from="1772542623808" duration="2660000" />
+      <workItem from="1772610582467" duration="5877000" />
+      <workItem from="1772729077803" duration="6839000" />
     </task>
     <servers />
   </component>
@@ -80,5 +84,9 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="fix functions with stations : bar, kitchen, service" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix functions with stations : bar, kitchen, service" />
   </component>
 </project>

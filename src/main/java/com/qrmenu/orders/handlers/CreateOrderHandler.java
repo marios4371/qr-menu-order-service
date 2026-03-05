@@ -7,6 +7,7 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.google.gson.Gson;
 import com.qrmenu.orders.models.Order;
+import com.qrmenu.orders.models.OrderItem;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
@@ -29,6 +30,44 @@ public class CreateOrderHandler implements RequestHandler<APIGatewayProxyRequest
         try {
             // DESERIALIZE: Convert the JSON body from the client into our Order object
             Order newOrder = gson.fromJson(request.getBody(), Order.class);
+
+            if (newOrder.getOrderItem() != null && !newOrder.getOrderItem().isEmpty()) {
+                OrderItem firstItem = newOrder.getOrderItem().get(0);
+                if (firstItem.getStation() == null || firstItem.getStation().isEmpty()) {
+                    String rawBody = request.getBody().replace("\"", "'"); // Αλλαγή σε μονά αυτάκια για να μην σπάσει το JSON
+                    return createResponse(400, "{\"error\": \"DEBUG_STATION_NULL | Η Java έλαβε αυτό: " + rawBody + "\"}");
+                }
+            }
+
+            // when new order is initialized takes some standard states
+            newOrder.setStatus("NEW");
+            newOrder.setPaymentStatus("UNPAID");
+            newOrder.setClaimedBy("NONE");
+            if (newOrder.getSource() == null) {
+                newOrder.setSource("CUSTOMER_QR");
+            }
+
+            String currentTimestamp = Instant.now().toString();
+            if (newOrder.getOrderItem() != null) {
+                for (OrderItem item : newOrder.getOrderItem()) {
+                    item.setItemStatus("PENDING");
+                    item.setTimestamp(currentTimestamp);
+
+                    // LOGGING: Print exactly what Java received from the frontend
+                    context.getLogger().log("Received Item: " + item.getName() + " | Station: " + item.getStation() + " | ProductId: " + item.getProductId());
+
+                    // FAIL-SAFE: If station is null, force it, so it doesn't get dropped by Gson
+                    if (item.getStation() == null || item.getStation().trim().isEmpty()) {
+                        context.getLogger().log("WARNING: Station was null for item " + item.getName() + ". Defaulting to KITCHEN.");
+                        item.setStation("KITCHEN");
+                    }
+
+                    // FAIL-SAFE: If productId is null, use the name as ID
+                    if (item.getProductId() == null || item.getProductId().trim().isEmpty()) {
+                        item.setProductId(item.getName());
+                    }
+                }
+            }
 
             // VALIDATE: Ensure critical fields exist
             if (newOrder.getShopId() == null || newOrder.getShopId().isEmpty()) {
@@ -57,6 +96,13 @@ public class CreateOrderHandler implements RequestHandler<APIGatewayProxyRequest
             item.put("status", AttributeValue.builder().s(newOrder.getStatus()).build());
             item.put("createdAt", AttributeValue.builder().s(newOrder.getCreatedAt()).build());
 
+            if (newOrder.getPaymentStatus() != null) {
+                item.put("paymentStatus", AttributeValue.builder().s(newOrder.getPaymentStatus()).build());
+            }
+            if (newOrder.getClaimedBy() != null) {
+                item.put("claimedBy", AttributeValue.builder().s(newOrder.getClaimedBy()).build());
+            }
+
             if (newOrder.getTableNumber() != null) {
                 item.put("tableNumber", AttributeValue.builder().s(newOrder.getTableNumber()).build());
             }
@@ -79,7 +125,7 @@ public class CreateOrderHandler implements RequestHandler<APIGatewayProxyRequest
             dynamoDb.putItem(putRequest);
 
             // RESPOND: Return the generated IDs to the client
-            String responseBody = String.format("{\"message\": \"Order created\", \"orderId\": \"%s\"}", generatedOrderId);
+            String responseBody = String.format("{\"message\": \"Order V2\", \"orderId\": \"%s\"}", generatedOrderId);
             return createResponse(201, responseBody);
 
         } catch (Exception e) {
@@ -88,7 +134,7 @@ public class CreateOrderHandler implements RequestHandler<APIGatewayProxyRequest
         }
     }
 
-    // HELPER METHOD: Standardize API responses
+    // HELPER METHOD Standardize API responses
     private APIGatewayProxyResponseEvent createResponse(int statusCode, String body) {
         Map<String, String> headers = new HashMap<>();
         headers.put("Content-Type", "application/json");

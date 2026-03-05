@@ -13,6 +13,13 @@ public class OrderItem {
     // Can be a list of Strings or a list of specific Modifier objects later
     private List<String> modifiers;
 
+    // station for bar or kitchen
+    private String station;
+    // claim, pending etc.
+    private String itemStatus;
+    // timestamp string in order to see when each state of order happened
+    private String timestamp;
+
     public OrderItem() {
     }
 
@@ -42,6 +49,30 @@ public class OrderItem {
 
     public Double getUnitPrice() {
         return unitPrice;
+    }
+
+    public String getStation() {
+        return station;
+    }
+
+    public void setStation(String station) {
+        this.station = station;
+    }
+
+    public String getItemStatus() {
+        return itemStatus;
+    }
+
+    public void setItemStatus(String itemStatus) {
+        this.itemStatus = itemStatus;
+    }
+
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
     }
 
     public void setUnitPrice(Double unitPrice) {
